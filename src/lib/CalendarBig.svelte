@@ -6,7 +6,6 @@
 	export let calendarState;
 
 	$: ({ blankDaysCount, title, days, links, actions, selected_day } = $calendarState);
-	$: console.log('🚀 ~ file: CalendarBig.svelte:9 ~ selected_day:', selected_day);
 </script>
 
 <div class="contentWidth">
@@ -14,15 +13,21 @@
 		<h1 class="font-bold text-3xl">{title}</h1>
 
 		<a
-			class="bg-primary text-white rounded-full px-2"
+			class="today-button"
 			href="?"
 			on:click|preventDefault={actions.today}
+			data-sveltekit-noscroll
 		>
 			Heute
 		</a>
 	</div>
 	<div class="my-4 grid grid-cols-3 calendar transform">
-		<a class="button" href={links.previous} on:click|preventDefault={actions.previous}>
+		<a
+			class="button"
+			href={links.previous}
+			on:click|preventDefault={actions.previous}
+			data-sveltekit-noscroll
+		>
 			<ChevronLeft />
 		</a>
 
@@ -32,21 +37,22 @@
 			{/each}
 
 			{#each Array(blankDaysCount) as _}
-				<div class="dayBox" />
+				<div />
 			{/each}
 
 			{#each days as date}
-				<Day {date} {selected_day}>
-					<slot name="day" {date} />
-
-					<svelte:fragment slot="dialog" let:close let:close_link>
-						<slot name="dialog" {close} {close_link} {selected_day} />
-					</svelte:fragment>
+				<Day {date}>
+					<slot {date} />
 				</Day>
 			{/each}
 		</div>
 
-		<a class="button" href={links.next} on:click|preventDefault={actions.next}>
+		<a
+			class="button"
+			href={links.next}
+			on:click|preventDefault={actions.next}
+			data-sveltekit-noscroll
+		>
 			<ChevronRight />
 		</a>
 	</div>
@@ -60,5 +66,14 @@
 	.button {
 		@apply h-full hover:bg-opacity-10 hover:bg-gray-500 hover:shadow rounded;
 		@apply flex items-center justify-center;
+	}
+
+	.today-button {
+		border-radius: 9999px;
+		padding-left: 0.5rem;
+		padding-right: 0.5rem;
+
+		background-color: var(--calendar-accent, #ba1904);
+		color: var(--calendar-on-accent, #ffffff);
 	}
 </style>

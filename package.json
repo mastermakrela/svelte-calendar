@@ -1,6 +1,6 @@
 {
-	"name": "svelte-calendar",
-	"version": "0.0.1",
+	"name": "svelte-ssr-calendar",
+	"version": "0.1.0",
 	"scripts": {
 		"dev": "process.env.TZ = 'Europe/Amsterdam'; vite dev",
 		"build": "vite build && npm run package",

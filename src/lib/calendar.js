@@ -85,17 +85,17 @@ const stateExtension = derived(page, (state) => {
 			previous() {
 				url.searchParams.set(MONTH_QUERY, previous_month_query);
 				url.searchParams.delete('selected_day');
-				goto(url);
+				goto(url, { noScroll: true });
 			},
 			next() {
 				url.searchParams.set(MONTH_QUERY, next_month_query);
 				url.searchParams.delete('selected_day');
-				goto(url);
+				goto(url, { noScroll: true });
 			},
 			today() {
 				url.searchParams.delete(MONTH_QUERY);
 				url.searchParams.delete('selected_day');
-				goto(url);
+				goto(url, { noScroll: true });
 			}
 		}
 	};
