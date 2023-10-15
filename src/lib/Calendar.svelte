@@ -1,13 +1,14 @@
-<script lang="ts">
+<script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import CalendarBig from './CalendarBig.svelte';
-	import CalendarSmall from './CalendarSmall.svelte';
-	import { calendarState } from './calendar.js';
+	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import Day from './Day.svelte';
+	import { calendarState, weekdays } from './calendar.js';
 
-	let close_link: string;
+	let close_link;
 
 	$: ({ selected_day } = $calendarState);
+	$: ({ blankDaysCount, title, days, links, actions } = $calendarState);
 
 	$: {
 		const og_url = new URL($page.url);
@@ -18,20 +19,75 @@
 	const close = () => goto(close_link, { noScroll: true });
 </script>
 
-<div class="hidden md:block">
-	<CalendarBig {calendarState}>
-		<svelte:fragment let:date>
-			<slot {date} />
-		</svelte:fragment>
-	</CalendarBig>
-</div>
+<div>
+	<div class="header">
+		<h1>{title}</h1>
 
-<div class="block md:hidden">
-	<CalendarSmall {calendarState}>
-		<svelte:fragment let:date>
-			<slot {date} />
-		</svelte:fragment>
-	</CalendarSmall>
+		<div class="buttons">
+			<a
+				class="button"
+				href={links.previous}
+				on:click|preventDefault={actions.previous}
+				data-sveltekit-noscroll
+			>
+				<ChevronLeft />
+			</a>
+
+			<a
+				class="today-button"
+				href="?"
+				on:click|preventDefault={actions.today}
+				data-sveltekit-noscroll
+			>
+				Heute
+			</a>
+
+			<a
+				class="button"
+				href={links.next}
+				on:click|preventDefault={actions.next}
+				data-sveltekit-noscroll
+			>
+				<ChevronRight />
+			</a>
+		</div>
+	</div>
+
+	<div class="calendar">
+		<a
+			class="button big"
+			href={links.previous}
+			on:click|preventDefault={actions.previous}
+			data-sveltekit-noscroll
+		>
+			<ChevronLeft />
+		</a>
+
+		<div class="days flex-grow">
+			{#each weekdays as weekday}
+				<div class="weekdays">{weekday}</div>
+			{/each}
+
+			{#each Array(blankDaysCount) as _}
+				<div />
+			{/each}
+
+			{#each days as date}
+				<Day {date}>
+					<slot {date} />
+				</Day>
+			{/each}
+		</div>
+
+		<a
+			class="button big"
+			href={links.next}
+			on:click|preventDefault={actions.next}
+			data-sveltekit-noscroll
+		>
+			<ChevronRight />
+		</a>
+	</div>
 </div>
 
 {#if selected_day}
@@ -43,7 +99,61 @@
 	</slot>
 {/if}
 
-<style lang="postcss">
+<style style lang="postcss">
+	h1 {
+		@apply font-bold text-3xl;
+	}
+
+	.header {
+		@apply flex justify-between items-center;
+	}
+
+	.weekdays {
+		@apply font-semibold my-2;
+	}
+
+	.buttons {
+		@apply inline-flex space-x-1;
+	}
+
+	.button {
+		@apply h-full hover:bg-opacity-10 hover:bg-gray-500 hover:shadow rounded;
+		@apply flex items-center justify-center;
+	}
+
+	.button.big {
+		@apply hidden md:flex;
+	}
+
+	.today-button {
+		@apply rounded-full px-2;
+
+		background-color: var(--calendar-accent, #ba1904);
+		color: var(--calendar-on-accent, #ffffff);
+	}
+
+	.calendar {
+		@apply my-4 grid grid-cols-1 md:grid-cols-3 transform;
+	}
+
+	.days {
+		@apply grid grid-cols-7 gap-1 m-1;
+	}
+
+	@media (min-width: 768px) {
+		.header .button {
+			@apply hidden;
+		}
+
+		.calendar {
+			grid-template-columns: max-content auto max-content;
+		}
+
+		.days {
+			@apply grid grid-cols-7 gap-2 p-2;
+		}
+	}
+
 	dialog {
 		position: fixed;
 		margin: auto;
