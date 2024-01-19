@@ -1,33 +1,27 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { onMount, type Snippet } from 'svelte';
+	import { get } from 'svelte/store';
 	import { isToday } from './helpfunctions.js';
 
-	export let date: Date;
+	const { date, children } = $props<{ date: Date; url: URL; children: Snippet }>();
 
-	let url: URL;
+	let url = $state<URL>(new URL(get(page).url));
+	onMount(() => page.subscribe((value) => (url = new URL(value.url))));
 
-	$: date_string = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+	const date_string = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 
-	$: {
-		url = new URL($page.url);
-		url.searchParams.set('selected_day', date_string);
-	}
-
-	const onclick = () => goto(url, { noScroll: true });
+	$effect(() => {
+		url?.searchParams.set('selected_day', date_string);
+	});
 </script>
 
-<a
-	class="day-box cursor-pointer"
-	href={url.href}
-	on:click|preventDefault={onclick}
-	data-sveltekit-noscroll
->
+<a class="day-box cursor-pointer" href={url.href} data-sveltekit-noscroll>
 	<div class="day-number" class:today={isToday(date)}>
 		{date.getDate()}
 	</div>
 
-	<slot />
+	{@render children()}
 </a>
 
 <style style lang="postcss">

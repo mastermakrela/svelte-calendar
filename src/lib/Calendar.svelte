@@ -1,65 +1,36 @@
-<script>
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+<script lang="ts">
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import type { Snippet } from 'svelte';
 	import Day from './Day.svelte';
-	import { calendarState, weekdays } from './calendar.js';
+	import { CalendarState, weekdays } from './_calendar.svelte.js';
 
-	let close_link;
+	let { day, dialog } = $props<{
+		day: Snippet<Date>;
+		dialog?: Snippet<{ close_link: string; selected_day: string }>;
+	}>();
 
-	$: ({ selected_day } = $calendarState);
-	$: ({ blankDaysCount, title, days, links, actions } = $calendarState);
-
-	$: {
-		const og_url = new URL($page.url);
-		og_url.searchParams.delete('selected_day');
-		close_link = og_url.href;
-	}
-
-	const close = () => goto(close_link, { noScroll: true });
+	const cal = new CalendarState();
 </script>
 
 <div>
 	<div class="header">
-		<h1>{title}</h1>
+		<h1>{cal.title}</h1>
 
 		<div class="buttons">
-			<a
-				class="button"
-				href={links.previous}
-				on:click|preventDefault={actions.previous}
-				data-sveltekit-noscroll
-			>
+			<a class="button" href={cal.links.previous} data-sveltekit-noscroll>
 				<ChevronLeft />
 			</a>
 
-			<a
-				class="today-button"
-				href="?"
-				on:click|preventDefault={actions.today}
-				data-sveltekit-noscroll
-			>
-				Heute
-			</a>
+			<a class="today-button" href="?" data-sveltekit-noscroll> Heute </a>
 
-			<a
-				class="button"
-				href={links.next}
-				on:click|preventDefault={actions.next}
-				data-sveltekit-noscroll
-			>
+			<a class="button" href={cal.links.next} data-sveltekit-noscroll>
 				<ChevronRight />
 			</a>
 		</div>
 	</div>
 
 	<div class="calendar">
-		<a
-			class="button big"
-			href={links.previous}
-			on:click|preventDefault={actions.previous}
-			data-sveltekit-noscroll
-		>
+		<a class="button big" href={cal.links.previous} data-sveltekit-noscroll>
 			<ChevronLeft />
 		</a>
 
@@ -68,35 +39,32 @@
 				<div class="weekdays">{weekday}</div>
 			{/each}
 
-			{#each Array(blankDaysCount) as _}
+			{#each Array(cal.blank_days_count) as _}
 				<div />
 			{/each}
 
-			{#each days as date}
-				<Day {date}>
-					<slot {date} />
+			{#each cal.days as date (date)}
+				<Day {date} url={new URL(cal.url)}>
+					{@render day(date)}
 				</Day>
 			{/each}
 		</div>
 
-		<a
-			class="button big"
-			href={links.next}
-			on:click|preventDefault={actions.next}
-			data-sveltekit-noscroll
-		>
+		<a class="button big" href={cal.links.next} data-sveltekit-noscroll>
 			<ChevronRight />
 		</a>
 	</div>
 </div>
 
-{#if selected_day}
-	<slot name="dialog" {close} {close_link} {selected_day}>
+{#if cal.selected_day}
+	{#if dialog}
+		{@render dialog({ close_link: cal.close_link, selected_day: cal.selected_day })}
+	{:else}
 		<dialog open>
-			<p>{selected_day}</p>
-			<a href={close_link} on:click|preventDefault={close}> close </a>
+			<p>{cal.selected_day}</p>
+			<a href={cal.close_link}> close </a>
 		</dialog>
-	</slot>
+	{/if}
 {/if}
 
 <style style lang="postcss">
