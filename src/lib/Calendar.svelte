@@ -5,8 +5,8 @@
 	import { CalendarState, weekdays } from './_calendar.svelte.js';
 
 	let { day, dialog } = $props<{
-		day: Snippet<Date>;
-		dialog?: Snippet<{ close_link: string; selected_day: string }>;
+		day: Snippet<[Date]>;
+		dialog?: Snippet<[{ close_link: string; selected_day: string }]>;
 	}>();
 
 	const cal = new CalendarState();

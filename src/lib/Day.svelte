@@ -3,18 +3,15 @@
 	import { onMount, type Snippet } from 'svelte';
 	import { get } from 'svelte/store';
 	import { isToday } from './helpfunctions.js';
+	import { date_string } from './index.js';
 
 	const { date, children } = $props<{ date: Date; url: URL; children: Snippet }>();
 
 	let url = $state<URL>(new URL(get(page).url));
 	onMount(() => page.subscribe((value) => (url = new URL(value.url))));
 
-	const month = `${date.getMonth() + 1}`.padStart(2, '0');
-	const day = `${date.getDate()}`.padStart(2, '0');
-	const date_string = `${date.getFullYear()}-${month}-${day}`;
-
 	$effect(() => {
-		url?.searchParams.set('selected_day', date_string);
+		url?.searchParams.set('selected_day', date_string(date));
 	});
 </script>
 

@@ -1,3 +1,7 @@
+## 0.3.2
+
+- exported our `date_string` function to be used in other components
+
 ## 0.3.1
 
 - change date string in url to fix Safari `Invalid Date` error
