@@ -1,3 +1,7 @@
+## 0.3.1
+
+- change date string in url to fix Safari `Invalid Date` error
+
 ## 0.3.0
 
 - switched to svelte 5 and runes

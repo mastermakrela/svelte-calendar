@@ -9,7 +9,9 @@
 	let url = $state<URL>(new URL(get(page).url));
 	onMount(() => page.subscribe((value) => (url = new URL(value.url))));
 
-	const date_string = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+	const month = `${date.getMonth() + 1}`.padStart(2, '0');
+	const day = `${date.getDate()}`.padStart(2, '0');
+	const date_string = `${date.getFullYear()}-${month}-${day}`;
 
 	$effect(() => {
 		url?.searchParams.set('selected_day', date_string);
